@@ -1,3 +1,0 @@
-class HomePageVars {
-  HomePageVars() {}
-}
