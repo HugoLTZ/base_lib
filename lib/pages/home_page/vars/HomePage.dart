@@ -1,0 +1,3 @@
+class HomePageVars {
+  HomePageVars() {}
+}

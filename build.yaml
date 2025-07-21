@@ -1,0 +1,16 @@
+targets:
+  $default:
+    builders:
+      base_lib|template_builder:
+        enabled: true
+        generate_for:
+          - lib/src/templates/**
+
+builders:
+  template_builder:
+    import: "package:base_lib/src/builders/TemplateBuilder.dart"
+    builder_factories: ["templateBuilder"]
+    build_extensions: 
+      ".dart.tpl": [".dart"]
+    auto_apply: none
+    build_to: source
