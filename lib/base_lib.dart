@@ -12,6 +12,7 @@ export 'package:flutter/foundation.dart';
 // 状态管理 - 只导出 Riverpod，避免与 Dio 的冲突
 export 'package:flutter_riverpod/flutter_riverpod.dart'
     hide describeIdentity, shortHash;
+export 'package:get/get.dart' hide FormData, MultipartFile, Response;
 
 // 网络请求 - 主要导出 Dio
 export 'package:dio/dio.dart';
