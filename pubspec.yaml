@@ -22,6 +22,8 @@ dependencies:
   json_serializable: ^6.9.0
   logger: ^2.6.0
   connectivity_plus: ^6.1.4
+  yaml: ^3.1.2
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:
@@ -29,7 +31,11 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   build: ^2.4.1
   build_runner: ^2.4.7
-  yaml: ^3.1.2
+
+# 可执行命令配置
+executables:
+  generate:                    # 可通过 `dart pub run base_lib:generate` 调用
+  template_generator:          # 可通过 `dart pub run base_lib:template_generator` 调用
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

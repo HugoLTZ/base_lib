@@ -1,162 +1,188 @@
-# 🎯 灵活的模板文件生成指南
+# 🎯 Base Lib 代码生成功能使用指南
 
-你现在有**3种超级灵活**的方式来控制生成的文件名，完全无需修改模板文件！
+## 📖 概述
 
-## 🚀 方法1：交互式CLI工具（最简单）
+base_lib 提供了强大的代码生成功能，支持快速生成 Flutter 项目中的常用模板：页面、控制器、变量类和路由。
 
-### 🎮 交互模式
+## 🚀 使用方式
+
+### 方式一：交互式命令行生成（推荐）
+
 ```bash
 dart run tool/generate.dart
 ```
-然后按照提示选择：
-- 选择模板类型 (Page/Controller/Vars/Router)
-- 输入文件名
-- 输入类名（或留空自动生成）
 
-### ⚡ 命令行模式
+#### 功能菜单：
+1. **Page** - 生成基于 BasePage 的页面文件
+2. **Controller** - 生成基于 Riverpod 的状态管理控制器
+3. **Vars** - 生成变量类文件
+4. **Router** - 生成基于 GetX 的路由文件
+5. **Page Module** - 一键生成完整页面模块（页面+控制器+变量）
+6. **Exit** - 退出生成器
+
+#### 示例操作：
 ```bash
-# 语法：dart run tool/generate.dart [type] [fileName] [className]
+# 启动交互式生成器
+dart run tool/generate.dart
+
+# 选择 5 (Page Module)
+# 输入类名：LoginPage
+# 自动生成：
+#   - lib/pages/login_page/LoginPage.dart
+#   - lib/pages/login_page/controller/LoginPageController.dart  
+#   - lib/pages/login_page/vars/LoginPage.dart
+```
+
+### 方式二：命令行直接生成
+
+```bash
+# 单个文件生成
+dart run tool/generate.dart [type] [fileName] [className]
+
+# 页面模块生成
+dart run tool/generate.dart module [className]
+```
+
+#### 示例：
+```bash
+# 生成页面
 dart run tool/generate.dart page home_page HomePage
+
+# 生成控制器
 dart run tool/generate.dart controller user_controller UserController
-dart run tool/generate.dart vars app_vars AppVars
-dart run tool/generate.dart router app_router AppRouter
+
+# 生成完整页面模块
+dart run tool/generate.dart module LoginPage
 ```
 
-### 📂 输出目录映射
-- `page` → `lib/pages/`
-- `controller` → `lib/controllers/`
-- `vars` → `lib/vars/`
-- `router` → `lib/routes/`
+### 方式三：Build Runner 自动生成
 
----
+使用 build_runner 和模板文件：
 
-## 📋 方法2：配置文件批量生成（最强大）
+```bash
+# 运行构建
+flutter packages pub run build_runner build
 
-### 1️⃣ 编辑 `templates_config.yaml`
+# 或者监听模式
+flutter packages pub run build_runner watch
+```
+
+## 📁 生成的文件结构
+
+### 单个页面生成：
+```
+lib/pages/
+  └── home_page.dart
+```
+
+### 完整页面模块生成：
+```
+lib/pages/login_page/
+  ├── LoginPage.dart              # 页面文件
+  ├── controller/
+  │   └── LoginPageController.dart # 控制器文件
+  └── vars/
+      └── LoginPage.dart          # 变量文件
+```
+
+## 🎨 模板详解
+
+### 1. 页面模板 (basic_page.dart.tpl)
+生成基于 `BasePage` 的 Flutter 页面：
+- 继承 BasePage 基类
+- 集成 Riverpod 状态管理
+- 预设页面结构和生命周期
+
+### 2. 控制器模板 (basic_controller.dart.tpl)
+生成 Riverpod 状态管理控制器：
+- StateNotifier 模式
+- 自动注入 Provider
+- 状态管理样板代码
+
+### 3. 变量模板 (basic_vars.dart.tpl)  
+生成变量类：
+- 页面相关常量和配置
+- 类型安全的变量管理
+
+### 4. 路由模板 (router.dart.tpl)
+生成 GetX 路由配置：
+- 路由名称定义
+- GetPage 配置
+- 导航管理
+
+## ⚙️ 自定义模板
+
+### 模板变量
+所有模板支持以下变量替换：
+- `{{className}}` - 类名（大驼峰）
+- `{{littleName}}` - 实例名（小驼峰）
+
+### 修改模板
+模板文件位于：`lib/src/templates/`
+- `basic_page.dart.tpl` - 页面模板
+- `basic_controller.dart.tpl` - 控制器模板  
+- `basic_vars.dart.tpl` - 变量模板
+- `router.dart.tpl` - 路由模板
+
+## 📦 在其他项目中使用
+
+### 1. 添加依赖
 ```yaml
-templates:
-  pages:
-    - fileName: home_page
-      className: HomePage
-      template: basic_page.dart.tpl
-    - fileName: user_profile_page
-      className: UserProfilePage
-      template: basic_page.dart.tpl
-    - fileName: settings_page
-      className: SettingsPage
-      template: basic_page.dart.tpl
+# pubspec.yaml
+dependencies:
+  base_lib:
+    path: ../path/to/base_lib  # 或 git/pub 地址
 
-  controllers:
-    - fileName: home_controller
-      className: HomeController
-      template: basic_controller.dart.tpl
-    - fileName: user_controller
-      className: UserController
-      template: basic_controller.dart.tpl
-
-  vars:
-    - fileName: app_vars
-      className: AppVars
-      template: basic_vars.dart.tpl
-
-  routes:
-    - fileName: app_router
-      className: AppRouter
-      template: router.dart.tpl
+dev_dependencies:
+  build_runner: ^2.4.7
+  build: ^2.4.1
 ```
 
-### 2️⃣ 运行批量生成
-```bash
-dart run tool/template_generator.dart
+### 2. 配置构建规则
+创建 `build.yaml`：
+```yaml
+targets:
+  $default:
+    builders:
+      base_lib|template_builder:
+        enabled: true
+        generate_for:
+          - lib/src/templates/**
+
+builders:
+  template_builder:
+    import: "package:base_lib/src/builders/TemplateBuilder.dart"
+    builder_factories: ["templateBuilder"]
+    build_extensions: 
+      ".dart.tpl": [".dart"]
+    auto_apply: none
+    build_to: source
 ```
 
-这会一次性生成配置文件中定义的所有文件！
+### 3. 复制生成工具
+将 `tool/` 目录复制到你的项目中，即可使用命令行生成功能。
 
----
+## 🎯 最佳实践
 
-## 🎨 方法3：重命名模板文件（传统方式）
+1. **使用页面模块生成**：推荐使用选项5一键生成完整模块
+2. **命名规范**：使用大驼峰命名类名（如：LoginPage、UserController）
+3. **目录结构**：保持生成的目录结构，便于项目管理
+4. **模板定制**：根据项目需要修改模板文件
 
-简单粗暴，适合单次使用：
-```bash
-# 想生成 login_page.dart
-重命名：basic_page.dart.tpl → login_page.dart.tpl
+## 🔧 常见问题
 
-# 想生成 auth_controller.dart  
-重命名：basic_controller.dart.tpl → auth_controller.dart.tpl
+**Q: 如何修改生成的文件路径？**
+A: 修改 `tool/generate.dart` 中的 `_getOutputPath` 方法。
 
-# 然后运行
-dart run build_runner build
-```
+**Q: 如何添加新的模板类型？**
+A: 在 `lib/src/templates/` 添加新模板，并在生成工具中注册。
 
----
+**Q: 生成的代码报错怎么办？**
+A: 确保项目已添加必要依赖（flutter_riverpod、get等）。
 
-## 🎯 使用场景推荐
+## 📞 技术支持
 
-### 🚀 **快速生成单个文件**
-```bash
-dart run tool/generate.dart page profile_page ProfilePage
-```
-
-### 📦 **新项目初始化**
-编辑 `templates_config.yaml` 添加所有需要的页面和控制器，然后：
-```bash
-dart run tool/template_generator.dart
-```
-
-### 🔄 **持续开发**
-使用交互模式，逐个生成需要的文件：
-```bash
-dart run tool/generate.dart
-```
-
----
-
-## ✨ 生成效果示例
-
-### 📝 输入
-```bash
-dart run tool/generate.dart page user_profile_page UserProfilePage
-```
-
-### 📂 输出
-- 文件：`lib/pages/user_profile_page.dart`
-- 类名：`UserProfilePage`, `UserProfilePageState`
-- 变量：`userProfilePage`
-
-### 🔧 自动处理
-- ✅ 自动创建目录（如果不存在）
-- ✅ 智能命名转换（下划线 → 大驼峰）
-- ✅ 自动生成对应的Provider名称
-
----
-
-## 💡 高级技巧
-
-### 🎨 **自定义模板变量**
-在模板文件中可以使用：
-- `{{className}}` - 大驼峰类名
-- `{{littleName}}` - 小驼峰变量名
-
-### 📁 **批量重构**
-想要重新生成所有文件？修改 `templates_config.yaml` 然后重新运行即可！
-
-### 🛠️ **集成到VS Code**
-在 `tasks.json` 中添加：
-```json
-{
-  "label": "Generate Template",
-  "type": "shell",
-  "command": "dart run tool/generate.dart",
-  "group": "build",
-  "presentation": {
-    "echo": true,
-    "reveal": "always",
-    "focus": false,
-    "panel": "shared"
-  }
-}
-```
-
----
-
-🎉 **现在你拥有了完全的控制权！**无需修改任何模板文件，就能灵活生成任意文件名和类名的代码文件！ 
+如有问题，请查看：
+- 模板文件：`lib/src/templates/`
+- 生成工具：`tool/generate.dart`
+- 构建配置：`build.yaml` 

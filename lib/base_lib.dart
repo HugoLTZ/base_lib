@@ -31,3 +31,7 @@ export 'src/utils/Storageutils.dart';
 // ===== 构建器模块 =====
 // 模板构建器（主要用于代码生成）
 export 'src/builders/TemplateBuilder.dart';
+
+// ===== 代码生成器模块 =====
+// 代码生成器API（编程式调用）
+export 'src/generator/code_generator.dart';
