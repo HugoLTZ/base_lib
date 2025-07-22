@@ -31,6 +31,9 @@ export 'package:permission_handler/permission_handler.dart';
 export 'package:url_launcher/url_launcher.dart';
 export 'package:path_provider/path_provider.dart';
 
+// UI适配
+export 'package:flutter_screenutil/flutter_screenutil.dart';
+
 // ===== 页面基类模块 =====
 export 'src/page/BasePage.dart';
 
