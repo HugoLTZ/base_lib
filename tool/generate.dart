@@ -31,6 +31,15 @@ Future<void> handleCommandArgs(List<String> args) async {
     }
     final className = args[1];
     await generatePageModule(className);
+  } else if (type == 'http_module') {
+    // 生成完整HTTP模块
+    if (args.length < 2) {
+      print('❌ HTTP module generation requires projectName');
+      printUsage();
+      return;
+    }
+    final projectName = args[1];
+    await generateHttpModule(projectName);
   } else {
     // 单个文件生成
     if (args.length < 3) {
@@ -51,12 +60,18 @@ Future<void> interactiveMode() async {
     print('3. Vars');
     print('4. Router');
     print('5. Page Module (页面+控制器+变量)');
-    print('6. Exit');
+    print('6. HTTP API');
+    print('7. HTTP Exception');
+    print('8. HTTP Interceptor');
+    print('9. HTTP Request');
+    print('10. HTTP Stream Request');
+    print('11. HTTP Module (完整HTTP模块)');
+    print('12. Exit');
 
-    stdout.write('\nEnter your choice (1-6): ');
+    stdout.write('\nEnter your choice (1-12): ');
     final choice = stdin.readLineSync();
 
-    if (choice == '6') {
+    if (choice == '12') {
       print('👋 Goodbye!');
       break;
     }
@@ -72,6 +87,17 @@ Future<void> interactiveMode() async {
       }
 
       await generatePageModule(className.trim());
+    } else if (choice == '11') {
+      // 生成完整HTTP模块
+      stdout.write('📝 Enter project name (e.g., MyProject): ');
+      final projectName = stdin.readLineSync();
+
+      if (projectName == null || projectName.trim().isEmpty) {
+        print('❌ Project name cannot be empty.');
+        continue;
+      }
+
+      await generateHttpModule(projectName.trim());
     } else {
       // 单个文件生成
       final type = _getTypeFromChoice(choice);
@@ -118,6 +144,16 @@ String? _getTypeFromChoice(String? choice) {
       return 'vars';
     case '4':
       return 'router';
+    case '6':
+      return 'http_api';
+    case '7':
+      return 'http_exception';
+    case '8':
+      return 'http_interceptor';
+    case '9':
+      return 'http_request';
+    case '10':
+      return 'http_stream_request';
     default:
       return null;
   }
@@ -177,6 +213,70 @@ Future<void> generatePageModule(String className) async {
   }
 }
 
+/// 生成完整的HTTP模块（API+异常+拦截器+请求）
+Future<void> generateHttpModule(String projectName) async {
+  try {
+    print('\n🚀 Generating HTTP module for: $projectName');
+
+    // 创建HTTP目录结构
+    final httpDir = 'lib/src/http';
+    final apiDir = '$httpDir/api';
+    final exceptionDir = '$httpDir/exception';
+    final interceptorDir = '$httpDir/interceptor';
+    final requestDir = '$httpDir/request';
+
+    await Directory(apiDir).create(recursive: true);
+    await Directory(exceptionDir).create(recursive: true);
+    await Directory(interceptorDir).create(recursive: true);
+    await Directory(requestDir).create(recursive: true);
+
+    // 生成API文件
+    await _generateHttpModuleFile(
+      templateFile: 'http/api/RequestApi.dart.tpl',
+      outputPath: '$apiDir/${projectName}Api.dart',
+      className: '${projectName}Api',
+    );
+
+    // 生成异常处理文件
+    await _generateHttpModuleFile(
+      templateFile: 'http/exception/HttpException.dart.tpl',
+      outputPath: '$exceptionDir/${projectName}Exception.dart',
+      className: '${projectName}Exception',
+    );
+
+    // 生成拦截器文件
+    await _generateHttpModuleFile(
+      templateFile: 'http/interceptor/PrettyDioLogger.dart.tpl',
+      outputPath: '$interceptorDir/PrettyDioLogger.dart',
+      className: 'PrettyDioLogger',
+    );
+
+    await _generateHttpModuleFile(
+      templateFile: 'http/interceptor/RequestHeadInterceptor.dart.tpl',
+      outputPath: '$interceptorDir/RequestHeadInterceptor.dart',
+      className: 'RequestHeadInterceptor',
+    );
+
+    // 生成请求文件
+    await _generateHttpModuleFile(
+      templateFile: 'http/request/HttpRequest.dart.tpl',
+      outputPath: '$requestDir/${projectName}Request.dart',
+      className: '${projectName}Request',
+    );
+
+    print('\n✅ HTTP module generated successfully!');
+    print('📂 Files created:');
+    print('   - $apiDir/${projectName}Api.dart');
+    print('   - $exceptionDir/${projectName}Exception.dart');
+    print('   - $interceptorDir/PrettyDioLogger.dart');
+    print('   - $interceptorDir/RequestHeadInterceptor.dart');
+    print('   - $requestDir/${projectName}Request.dart');
+    print('   - $requestDir/Stream${projectName}Request.dart');
+  } catch (e) {
+    print('❌ Error generating HTTP module: $e');
+  }
+}
+
 /// 生成模块中的单个文件
 Future<void> _generateModuleFile({
   required String templateFile,
@@ -198,6 +298,36 @@ Future<void> _generateModuleFile({
   content = _removeConfigComments(content);
 
   // 替换变量
+  content = content
+      .replaceAll('{{className}}', className)
+      .replaceAll('{{littleName}}', littleName);
+
+  // 写入文件
+  final outputFile = File(outputPath);
+  await outputFile.writeAsString(content);
+}
+
+/// 生成HTTP模块中的单个文件
+Future<void> _generateHttpModuleFile({
+  required String templateFile,
+  required String outputPath,
+  required String className,
+}) async {
+  final templatePath = 'lib/src/templates/$templateFile';
+  final template = File(templatePath);
+
+  if (!await template.exists()) {
+    print('❌ Template file not found: $templatePath');
+    return;
+  }
+
+  var content = await template.readAsString();
+
+  // 移除配置注释
+  content = _removeConfigComments(content);
+
+  // 替换变量
+  final littleName = _generateLittleName(className);
   content = content
       .replaceAll('{{className}}', className)
       .replaceAll('{{littleName}}', littleName);
@@ -271,6 +401,16 @@ String _getTemplateFile(String type) {
       return 'basic_vars.dart.tpl';
     case 'router':
       return 'router.dart.tpl';
+    case 'http_api':
+      return 'http/api/RequestApi.dart.tpl';
+    case 'http_exception':
+      return 'http/exception/HttpException.dart.tpl';
+    case 'http_interceptor':
+      return 'http/interceptor/PrettyDioLogger.dart.tpl';
+    case 'http_request':
+      return 'http/request/HttpRequest.dart.tpl';
+    case 'http_stream_request':
+      return 'http/request/StreamHttpRequest.dart.tpl';
     default:
       return 'basic_page.dart.tpl';
   }
@@ -286,6 +426,16 @@ String _getOutputPath(String type, String fileName) {
       return 'lib/vars/$fileName.dart';
     case 'router':
       return 'lib/routes/$fileName.dart';
+    case 'http_api':
+      return 'lib/http/api/$fileName.dart';
+    case 'http_exception':
+      return 'lib/http/exception/$fileName.dart';
+    case 'http_interceptor':
+      return 'lib/http/interceptor/$fileName.dart';
+    case 'http_request':
+      return 'lib/http/request/$fileName.dart';
+    case 'http_stream_request':
+      return 'lib/http/request/$fileName.dart';
     default:
       return 'lib/$fileName.dart';
   }
@@ -328,13 +478,19 @@ void printUsage() {
   print('  Page module generation:');
   print('    dart run tool/generate.dart module [className]');
   print('');
-  print('Types: page, controller, vars, router, module');
+  print('  HTTP module generation:');
+  print('    dart run tool/generate.dart http_module [projectName]');
+  print('');
+  print(
+      'Types: page, controller, vars, router, module, http_api, http_exception, http_interceptor, http_request, http_stream_request, http_module');
   print('');
   print('Examples:');
   print('  dart run tool/generate.dart page home_page HomePage');
   print(
       '  dart run tool/generate.dart controller user_controller UserController');
   print('  dart run tool/generate.dart module LoginPage');
+  print('  dart run tool/generate.dart http_api request_api RequestApi');
+  print('  dart run tool/generate.dart http_module MyProject');
   print('');
   print('Or run without arguments for interactive mode:');
   print('  dart run tool/generate.dart');

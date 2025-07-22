@@ -1,9 +1,7 @@
-// @type: vars
-// @description: UI样式变量
 import 'package:flutter/material.dart';
 
-/// {{className}} UI样式变量
-class {{className}}Vars {
+/// TestPageVars UI样式变量
+class TestPageVarsVars {
   // 颜色变量
   static const Color primaryColor = Color(0xFF2196F3);
   static const Color backgroundColor = Color(0xFFF5F5F5);

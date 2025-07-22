@@ -1,3 +1,5 @@
+// @type: request
+// @description: 请求工具
 import 'dart:convert';
 
 import 'package:base_lib/src/utils/LogUtils.dart';
@@ -21,10 +23,10 @@ const Duration _sendTimeout = Duration(seconds: 60);
 typedef Success<T> = Function(T data);
 typedef Fail = Function(int code, String msg);
 
-/// @class : HttpRequest
+/// @class : {{className}}
 /// @name :
 /// @description :请求工具
-class HttpRequest {
+class {{className}} {
   ///全局Dia对象
   static Dio? _dio;
 
@@ -131,4 +133,4 @@ const _methodValues = {
   Method.PUT: "put",
   Method.PATCH: "patch",
   Method.HEAD: "head",
-};
+}; 

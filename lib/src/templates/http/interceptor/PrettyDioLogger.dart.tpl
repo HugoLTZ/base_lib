@@ -1,9 +1,11 @@
+// @type: interceptor
+// @description: Pretty Dio Logger for request/response logging
 import 'dart:math' as math;
 
 import 'package:base_lib/src/utils/LogUtils.dart';
 import 'package:dio/dio.dart';
 
-class PrettyDioLogger extends Interceptor {
+class {{className}} extends Interceptor {
   /// Print request [Options]
   final bool request;
 
@@ -39,7 +41,7 @@ class PrettyDioLogger extends Interceptor {
   /// you can also write log in a file.
   void Function(Object object) logPrint;
 
-  PrettyDioLogger(
+  {{className}}(
       {this.request = true,
       this.requestHeader = false,
       this.requestBody = false,
@@ -274,4 +276,4 @@ class PrettyDioLogger extends Interceptor {
         (dynamic key, dynamic value) => _printKV(key.toString(), value));
     _printLine('╚');
   }
-}
+} 

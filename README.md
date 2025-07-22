@@ -8,10 +8,8 @@ Base Lib 是一个全面的 Flutter 开发基础库，提供了统一的页面�
 
 ### 📱 核心模块
 - **BasePage** - 统一的页面基类架构
-- **HttpRequest** - 网络请求工具（支持普通和流式请求）
 - **LogUtils** - 日志管理工具
 - **StorageUtils** - 本地存储工具
-- **RequestApi** - API接口常量管理
 
 ### 🎯 代码生成功能（重点特性）
 
@@ -48,12 +46,6 @@ await CodeGenerator.generateController('UserController');
 dependencies:
   base_lib:
     path: ../base_lib  # 或者你的库路径
-  flutter_riverpod: ^2.6.1
-  get: ^4.7.2
-  shared_preferences: ^2.5.3
-  dio: ^5.8.0+1
-  logger: ^2.6.0
-  connectivity_plus: ^6.1.4
 ```
 
 ### 2. 生成页面模块
@@ -91,32 +83,51 @@ class MyApp extends StatelessWidget {
 - ✅ 智能命名转换
 - ✅ 标准项目结构
 
-## 🔧 高级功能
+## 📐 代码规范与架构设计
 
-### 自定义模板
-在项目中创建 `lib/src/templates/` 目录，放入自定义模板文件即可覆盖默认模板。
+### 页面模块结构设计
 
-### 编程式批量生成
-```dart
-Future<void> initProject() async {
-  final modules = ['HomePage', 'UserPage', 'SettingsPage'];
-  for (final module in modules) {
-    await CodeGenerator.generatePageModule(module);
-  }
-}
+Base Lib 采用**模块化页面架构**，每个页面都是一个独立的模块，包含三个核心部分：
+
+```
+lib/pages/user_profile_page/
+├── UserProfilePage.dart           # 📱 页面UI层
+├── controller/
+│   └── UserProfilePageController.dart  # 🎮 业务逻辑层
+└── vars/
+    └── UserProfilePageVars.dart        # 🎨 UI样式变量层
 ```
 
-### 网络请求示例
-```dart
-// 使用内置的网络请求工具
-await HttpRequest.request(
-  Method.GET,
-  '/api/users',
-  {},
-  success: (data) => LogUtils.i('Success: $data'),
-  fail: (code, msg) => LogUtils.e('Error: $code - $msg'),
-);
+### 代码规范
+
+#### 1. **架构层级职责**
+- **Page层** (`*.dart`) - 纯UI展示，负责界面布局和用户交互
+- **Controller层** (`controller/`) - 业务逻辑处理，事件响应和数据操作  
+- **Vars层** (`vars/`) - UI样式变量，颜色、字体、尺寸等样式常量
+
+
+#### 2. **命名规范**
+- **文件命名**: 使用 PascalCase，如 `UserProfilePage.dart`
+- **目录命名**: 使用 snake_case，如 `user_profile_page/`
+- **类命名**: 统一后缀，如 `UserProfilePageController`、`UserProfilePageVars`
+
+### HTTP模块结构设计
+
+HTTP相关代码统一放置在 `lib/src/http/` 目录下：
+
 ```
+lib/src/http/
+├── api/
+│   └── RequestApi.dart          # 📡 API接口定义
+├── exception/
+│   └── HttpException.dart       # ⚠️ 异常处理
+├── interceptor/
+│   ├── PrettyDioLogger.dart     # 📝 日志拦截器
+│   └── RequestHeadInterceptor.dart  # 🔐 请求头拦截器
+└── request/
+    └── HttpRequest.dart         # 🌐 请求工具类
+```
+
 
 ## 📚 文档
 

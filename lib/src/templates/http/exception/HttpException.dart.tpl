@@ -1,11 +1,13 @@
+// @type: exception
+// @description: 错误信息处理
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-/// @class : HttpException
+/// @class : {{className}}
 /// @name :
 /// @description :错误信息处理
-class HttpException {
+class {{className}} {
   static const int success = 200;
   static const int successNotContent = 204;
   static const int unauthorized = 401;
@@ -55,4 +57,4 @@ class NetError {
   String msg;
 
   NetError(this.code, this.msg);
-}
+} 

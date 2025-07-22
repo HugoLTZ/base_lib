@@ -1,3 +1,5 @@
+// @type: interceptor  
+// @description: Interceptor for adding authentication headers to requests
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
@@ -5,7 +7,7 @@ import 'package:dio/dio.dart' as dio;
 String platform = Platform.isAndroid ? "android" : "ios";
 
 /// Interceptor for adding authentication headers to requests
-class RequestHeadInterceptor extends dio.Interceptor {
+class {{className}} extends dio.Interceptor {
   @override
   Future<void> onRequest(
     dio.RequestOptions options,
@@ -43,4 +45,4 @@ class RequestHeadInterceptor extends dio.Interceptor {
     };
     return httpHeaders;
   }
-}
+} 
