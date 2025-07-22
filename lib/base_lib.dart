@@ -3,20 +3,33 @@ library base_lib;
 // 导出初始化文件
 export 'init.dart';
 
-// ===== HTTP网络请求相关模块 =====
-// API接口常量
-export 'src/http/api/RequestApi.dart';
+// ===== 第三方库导出 =====
+// Flutter核心库
+export 'package:flutter/material.dart';
+export 'package:flutter/services.dart';
+export 'package:flutter/foundation.dart';
 
-// HTTP请求工具类
-export 'src/http/request/HttpRequest.dart';
-// export 'src/http/request/StreamHttpRequest.dart' hide Success, Fail, Method;
+// 状态管理 - 只导出 Riverpod，避免与 Dio 的冲突
+export 'package:flutter_riverpod/flutter_riverpod.dart'
+    hide describeIdentity, shortHash;
 
-// HTTP异常处理
-export 'src/http/exception/HttpException.dart';
+// 网络请求 - 主要导出 Dio
+export 'package:dio/dio.dart';
+export 'package:connectivity_plus/connectivity_plus.dart';
 
-// HTTP拦截器
-export 'src/http/interceptor/RequestHeadInterceptor.dart';
-export 'src/http/interceptor/PrettyDioLogger.dart';
+// 本地存储
+export 'package:shared_preferences/shared_preferences.dart';
+
+// 日志记录
+export 'package:logger/logger.dart';
+
+// 工具库
+export 'package:path/path.dart';
+
+// 权限和系统功能
+export 'package:permission_handler/permission_handler.dart';
+export 'package:url_launcher/url_launcher.dart';
+export 'package:path_provider/path_provider.dart';
 
 // ===== 页面基类模块 =====
 export 'src/page/BasePage.dart';

@@ -11,6 +11,11 @@ Base Lib 是一个全面的 Flutter 开发基础库，提供了统一的页面�
 - **LogUtils** - 日志管理工具
 - **StorageUtils** - 本地存储工具
 
+### 📦 第三方库导出
+- **一站式导入** - 只需导入 `base_lib` 即可使用所有常用第三方库
+- **冲突解决** - 自动处理库之间的命名冲突
+- **包含库**：Flutter核心库、Riverpod、Dio、SharedPreferences、Logger等
+
 ### 🎯 代码生成功能（重点特性）
 
 **🎉 无需复制任何文件！** 现在可以直接通过命令调用代码生成功能：
@@ -62,14 +67,43 @@ dart pub run base_lib:generate module UserProfilePage
 ### 3. 使用生成的代码
 
 ```dart
+// 一行导入即可使用所有功能：Material UI、Riverpod、Dio、日志等
 import 'package:base_lib/base_lib.dart';
 import 'pages/user_profile_page/UserProfilePage.dart';
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: UserProfilePage(), // 使用生成的页面
+    return ProviderScope(  // Riverpod 已导出
+      child: MaterialApp(  // Material UI 已导出
+        home: UserProfilePage(), // 使用生成的页面
+      ),
+    );
+  }
+}
+
+// 在页面中可以直接使用所有导出的库
+class HomePage extends BasePage {
+  @override
+  Widget buildPage(BuildContext context) {
+    return Scaffold(
+      body: Consumer(builder: (context, ref, child) {
+        // 直接使用 Riverpod
+        return Center(child: Text('Welcome!'));
+      }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // 直接使用 Dio 和 Logger
+          final dio = Dio();
+          try {
+            final response = await dio.get('https://api.example.com');
+            LogUtils.i('Response: ${response.data}');
+          } catch (e) {
+            LogUtils.e('Error: $e');
+          }
+        },
+        child: Icon(Icons.download),
+      ),
     );
   }
 }
@@ -132,6 +166,8 @@ lib/src/http/
 ## 📚 文档
 
 - [详细使用指南](README_TEMPLATE_USAGE.md)
+- [HTTP模板使用指南](HTTP_TEMPLATE_USAGE.md)
+- [第三方库导出说明](LIBRARY_EXPORTS.md)
 - [新功能说明](UPDATED_USAGE.md)
 - [使用示例](example_usage.md)
 
